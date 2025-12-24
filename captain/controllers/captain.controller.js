@@ -1,7 +1,10 @@
-const captainModel = require('../models/captain.model.js');
-const blacklisttokenModel = require('../models/blacklisttoken.model.js');
+const captainModel = require('../models/captain.model');
+const blacklisttokenModel = require('../models/blacklisttoken.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { subscribeToQueue } = require('../service/rabbit')
+
+const pendingRequests = [];
 
 module.exports.register = async (req, res) => {
     try {
@@ -77,6 +80,7 @@ module.exports.profile = async (req, res) => {
     try {
         res.send(req.captain);
     } catch (error) {
+        console.log(error);
         res.status(500).json({ message: error.message });
     }
 }
@@ -88,6 +92,29 @@ module.exports.toggleAvailability = async (req, res) => {
         await captain.save();
         res.send(captain);
     } catch (error) {
+
         res.status(500).json({ message: error.message });
     }
 }
+
+module.exports.waitForNewRide = async (req, res) => {
+    // Set timeout for long polling (e.g., 30 seconds)
+    req.setTimeout(30000, () => {
+        res.status(204).end(); // No Content
+    });
+
+    // Add the response object to the pendingRequests array
+    pendingRequests.push(res);
+};
+
+subscribeToQueue("new-ride", (data) => {
+    const rideData = JSON.parse(data);
+
+    // Send the new ride data to all pending requests
+    pendingRequests.forEach(res => {
+        res.json(rideData);
+    });
+
+    // Clear the pending requests
+    pendingRequests.length = 0;
+});
