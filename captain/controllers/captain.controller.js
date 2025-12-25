@@ -109,7 +109,7 @@ module.exports.waitForNewRide = async (req, res) => {
 
 subscribeToQueue("new-ride", (data) => {
     const rideData = JSON.parse(data);
-
+    console.log("new ride request for captain", rideData);
     // Send the new ride data to all pending requests
     pendingRequests.forEach(res => {
         res.json(rideData);

@@ -13,6 +13,7 @@ module.exports.createRide = async (req, res, next) => {
         destination
     })
     await newRide.save();
+    console.log("new ride created", newRide)
     publishToQueue("new-ride", JSON.stringify(newRide))
     res.send(newRide);
 }

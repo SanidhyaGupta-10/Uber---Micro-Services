@@ -97,6 +97,7 @@ module.exports.acceptedRide = async (req, res) => {
 }
 
 subscribeToQueue('ride-accepted', async (msg) => {
+    console.log("ride accepted event received in user service", msg);
     const data = JSON.parse(msg);
     rideEventEmitter.emit('ride-accepted', data);
 });
