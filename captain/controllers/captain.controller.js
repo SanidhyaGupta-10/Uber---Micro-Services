@@ -97,6 +97,17 @@ module.exports.toggleAvailability = async (req, res) => {
     }
 }
 
+subscribeToQueue("new-ride", (data) => {
+    const rideData = JSON.parse(data);
+    console.log("new ride request for captain", rideData);
+    // Send the new ride data to all pending requests
+    pendingRequests.forEach(res => {
+        res.json(rideData);
+    });
+    // Clear the pending requests
+    pendingRequests.length = 0;
+});
+
 module.exports.waitForNewRide = async (req, res) => {
     // Set timeout for long polling (e.g., 30 seconds)
     req.setTimeout(30000, () => {
@@ -107,14 +118,3 @@ module.exports.waitForNewRide = async (req, res) => {
     pendingRequests.push(res);
 };
 
-subscribeToQueue("new-ride", (data) => {
-    const rideData = JSON.parse(data);
-    console.log("new ride request for captain", rideData);
-    // Send the new ride data to all pending requests
-    pendingRequests.forEach(res => {
-        res.json(rideData);
-    });
-
-    // Clear the pending requests
-    pendingRequests.length = 0;
-});
