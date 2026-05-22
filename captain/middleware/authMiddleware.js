@@ -1,11 +1,18 @@
-const jwt = require('jsonwebtoken');
-const captainModel = require('../models/captain.model');
-const blacklisttokenModel = require('../models/blacklisttoken.model');
+import jwt from 'jsonwebtoken';
+import captainModel from '../models/captain.model.js';
+import blacklisttokenModel from '../models/blacklisttoken.model.js';
 
-
-module.exports.captainAuth = async (req, res, next) => {
+/**
+ * Middleware — Authenticates a captain by verifying their JWT token.
+ *
+ * Extracts the token from the request cookie or the Authorization header.
+ * Rejects blacklisted tokens and tokens that do not belong to a valid captain.
+ * On success, attaches the authenticated captain document to `req.captain`.
+ *
+ */
+export const captainAuth = async (req, res, next) => {
     try {
-        const token = req.cookies.token || req.headers.authorization.split(' ')[ 1 ];
+        const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
 
         if (!token) {
             return res.status(401).json({ message: 'Unauthorized' });
@@ -31,4 +38,6 @@ module.exports.captainAuth = async (req, res, next) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
+};
+
+export default { captainAuth };
