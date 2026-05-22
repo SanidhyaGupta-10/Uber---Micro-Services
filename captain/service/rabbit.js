@@ -2,6 +2,9 @@ import amqp from 'amqplib';
 
 const RABBITMQ_URL = process.env.RABBIT_URL;
 
+let connection = null;
+let channel = null;
+
 /**
  * Establishes a connection to RabbitMQ and creates a shared channel.
  * Should be called once at application startup.

@@ -2,6 +2,9 @@ import amqp from 'amqplib';
 
 const RABBITMQ_URL = process.env.RABBIT_URL;
 
+let connection = null;
+let channel = null;
+
 
 /**
  * Establishes a connection to RabbitMQ and creates a shared channel.
@@ -22,6 +25,7 @@ async function connect() {
  * @param {Function} callback  - Function called with the message content string
  * @returns {Promise<void>}
  */
+
 async function subscribeToQueue(queueName, callback) {
     if (!channel) await connect();
     await channel.assertQueue(queueName);
