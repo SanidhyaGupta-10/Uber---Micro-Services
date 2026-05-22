@@ -1,5 +1,11 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
+/**
+ * Connects to the MongoDB database using the MONGO_URI environment variable.
+ * Falls back to a local MongoDB URI for the captain service if MONGO_URI is not set.
+ *
+ * @returns {void}
+ */
 function connectDB() {
     const dbURI = process.env.MONGO_URI || 'mongodb://localhost:27017/uber_captain_service';
 
@@ -10,4 +16,4 @@ function connectDB() {
     });
 }
 
-module.exports = connectDB; 
+export default connectDB;
